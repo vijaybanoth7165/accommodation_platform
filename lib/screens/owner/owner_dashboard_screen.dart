@@ -4,6 +4,7 @@ import '../../data/mock_data.dart';
 import '../../models/property_model.dart';
 import '../rooms/rooms_screen.dart';
 import '../rooms/bed_availability_screen.dart';
+import '../settings/settings_screen.dart';
 
 class OwnerDashboardScreen extends StatefulWidget {
   final VoidCallback? onLogout;
@@ -82,9 +83,16 @@ class _OwnerDashboardScreenState extends State<OwnerDashboardScreen> {
             },
           ),
           IconButton(
-            tooltip: 'Logout',
-            icon: const Icon(Icons.logout_rounded, color: AppColors.textSecondary),
-            onPressed: widget.onLogout,
+            tooltip: 'Settings & Roles',
+            icon: const Icon(Icons.settings_outlined, color: AppColors.textSecondary),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => SettingsScreen(onLogout: widget.onLogout),
+                ),
+              );
+            },
           ),
         ],
       ),
@@ -252,13 +260,18 @@ class _OwnerDashboardScreenState extends State<OwnerDashboardScreen> {
               context,
               MaterialPageRoute(builder: (context) => BedAvailabilityScreen(property: currentProperty)),
             );
+          } else if (index == 3) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => SettingsScreen(onLogout: widget.onLogout)),
+            );
           }
         },
         items: const [
           BottomNavigationBarItem(icon: Icon(Icons.dashboard_rounded), label: 'Dashboard'),
           BottomNavigationBarItem(icon: Icon(Icons.meeting_room_outlined), label: 'Rooms'),
           BottomNavigationBarItem(icon: Icon(Icons.hotel_outlined), label: 'Availability'),
-          BottomNavigationBarItem(icon: Icon(Icons.people_outline_rounded), label: 'Residents'),
+          BottomNavigationBarItem(icon: Icon(Icons.settings_outlined), label: 'Settings'),
         ],
       ),
     );

@@ -13,11 +13,8 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStateMixin {
   late TabController _authTabController;
 
-  // Selected User Persona
-  String _selectedRole = 'Owner'; // 'Owner', 'Supervisor', 'Resident'
-
   // Controllers
-  final _phoneController = TextEditingController();
+  final _phoneController = TextEditingController(text: '9876543210');
   final _otpController = TextEditingController();
   final _emailController = TextEditingController(text: 'owner@stayflow.com');
   final _passwordController = TextEditingController(text: 'password123');
@@ -46,7 +43,7 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
     setState(() => _isLoading = true);
 
     // Simulate network authentication delay
-    await Future.delayed(const Duration(milliseconds: 900));
+    await Future.delayed(const Duration(milliseconds: 700));
 
     if (mounted) {
       setState(() => _isLoading = false);
@@ -54,8 +51,8 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
         widget.onLoginSuccess!();
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Logged in successfully as $_selectedRole'),
+          const SnackBar(
+            content: Text('Logged in successfully'),
             backgroundColor: AppColors.vacant,
             behavior: SnackBarBehavior.floating,
           ),
@@ -64,28 +61,19 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
     }
   }
 
-  void _fillDemoCredentials(String role) {
+  void _resetDemoCredentials() {
     setState(() {
-      _selectedRole = role;
-      if (role == 'Owner') {
-        _emailController.text = 'owner@pgstays.com';
-        _passwordController.text = 'admin123';
-        _phoneController.text = '9876543210';
-      } else if (role == 'Supervisor') {
-        _emailController.text = 'supervisor@pgstays.com';
-        _passwordController.text = 'staff123';
-        _phoneController.text = '9876500001';
-      } else {
-        _emailController.text = 'resident@pgstays.com';
-        _passwordController.text = 'resident123';
-        _phoneController.text = '9876599999';
-      }
+      _emailController.text = 'owner@stayflow.com';
+      _passwordController.text = 'password123';
+      _phoneController.text = '9876543210';
+      _otpSent = false;
+      _otpController.clear();
     });
 
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('Switched to $role demo account'),
-        duration: const Duration(seconds: 1),
+      const SnackBar(
+        content: Text('Demo credentials reset'),
+        duration: Duration(seconds: 1),
         behavior: SnackBarBehavior.floating,
       ),
     );
@@ -97,7 +85,7 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
-            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
+            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
             child: ConstrainedBox(
               constraints: const BoxConstraints(maxWidth: 440),
               child: Column(
@@ -105,11 +93,7 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                 children: [
                   // --- Brand Header ---
                   _buildBrandHeader(),
-                  const SizedBox(height: 28),
-
-                  // --- Role Selector ---
-                  _buildRoleSelector(),
-                  const SizedBox(height: 24),
+                  const SizedBox(height: 32),
 
                   // --- Auth Card ---
                   Container(
@@ -119,7 +103,7 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                       border: Border.all(color: AppColors.border),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withOpacity(0.04),
+                          color: Colors.black.withValues(alpha: 0.04),
                           blurRadius: 16,
                           offset: const Offset(0, 6),
                         ),
@@ -145,7 +129,7 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                                 borderRadius: BorderRadius.circular(9),
                                 boxShadow: [
                                   BoxShadow(
-                                    color: Colors.black.withOpacity(0.06),
+                                    color: Colors.black.withValues(alpha: 0.06),
                                     blurRadius: 4,
                                     offset: const Offset(0, 2),
                                   ),
@@ -189,7 +173,7 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                                       color: Colors.white,
                                     ),
                                   )
-                                : Text('Sign in as $_selectedRole'),
+                                : const Text('Sign In to Dashboard'),
                           ),
                         ],
                       ),
@@ -198,17 +182,17 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
 
                   const SizedBox(height: 20),
 
-                  // --- Quick Demo Presets ---
+                  // --- Quick Demo Preset Pill ---
                   _buildDemoPresets(),
 
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 18),
 
                   // Security & Multi-tenant note
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const Icon(Icons.shield_outlined, size: 14, color: AppColors.textMuted),
-                      const SizedBox(width: 6),
+                    children: const [
+                      Icon(Icons.shield_outlined, size: 14, color: AppColors.textMuted),
+                      SizedBox(width: 6),
                       Text(
                         'Strict Multi-Tenant Isolation & Data Encryption',
                         style: TextStyle(
@@ -232,18 +216,18 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
     return Column(
       children: [
         Container(
-          width: 64,
-          height: 64,
+          width: 68,
+          height: 68,
           decoration: BoxDecoration(
             gradient: const LinearGradient(
               colors: [Color(0xFF4F46E5), Color(0xFF6366F1)],
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
             ),
-            borderRadius: BorderRadius.circular(18),
+            borderRadius: BorderRadius.circular(20),
             boxShadow: [
               BoxShadow(
-                color: AppColors.primary.withOpacity(0.35),
+                color: AppColors.primary.withValues(alpha: 0.35),
                 blurRadius: 14,
                 offset: const Offset(0, 6),
               ),
@@ -252,7 +236,7 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
           child: const Icon(
             Icons.apartment_rounded,
             color: Colors.white,
-            size: 34,
+            size: 36,
           ),
         ),
         const SizedBox(height: 16),
@@ -267,7 +251,7 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
           ),
         ),
         const SizedBox(height: 4),
-        Text(
+        const Text(
           'PG, Hostel & Stay Management System',
           textAlign: TextAlign.center,
           style: TextStyle(
@@ -280,75 +264,6 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
     );
   }
 
-  Widget _buildRoleSelector() {
-    final roles = ['Owner', 'Supervisor', 'Resident'];
-
-    return Container(
-      padding: const EdgeInsets.all(4),
-      decoration: BoxDecoration(
-        color: AppColors.surfaceVariant.withOpacity(0.7),
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: AppColors.border),
-      ),
-      child: Row(
-        children: roles.map((role) {
-          final isSelected = _selectedRole == role;
-          IconData icon;
-          if (role == 'Owner') {
-            icon = Icons.admin_panel_settings_rounded;
-          } else if (role == 'Supervisor') {
-            icon = Icons.badge_outlined;
-          } else {
-            icon = Icons.person_outline_rounded;
-          }
-
-          return Expanded(
-            child: InkWell(
-              borderRadius: BorderRadius.circular(10),
-              onTap: () => _fillDemoCredentials(role),
-              child: AnimatedContainer(
-                duration: const Duration(milliseconds: 200),
-                padding: const EdgeInsets.symmetric(vertical: 9),
-                decoration: BoxDecoration(
-                  color: isSelected ? AppColors.surface : Colors.transparent,
-                  borderRadius: BorderRadius.circular(10),
-                  boxShadow: isSelected
-                      ? [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.05),
-                            blurRadius: 6,
-                            offset: const Offset(0, 2),
-                          )
-                        ]
-                      : [],
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(
-                      icon,
-                      size: 16,
-                      color: isSelected ? AppColors.primary : AppColors.textSecondary,
-                    ),
-                    const SizedBox(width: 6),
-                    Text(
-                      role,
-                      style: TextStyle(
-                        fontSize: 13,
-                        fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
-                        color: isSelected ? AppColors.primary : AppColors.textSecondary,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          );
-        }).toList(),
-      ),
-    );
-  }
-
   Widget _buildPhoneAuthForm() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -357,7 +272,7 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
           controller: _phoneController,
           keyboardType: TextInputType.phone,
           decoration: InputDecoration(
-            labelText: 'Mobile Number',
+            labelText: 'Registered Mobile Number',
             hintText: '98765 43210',
             prefixIcon: Container(
               padding: const EdgeInsets.symmetric(horizontal: 12),
@@ -449,9 +364,9 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
       decoration: BoxDecoration(
-        color: AppColors.primaryLight.withOpacity(0.6),
+        color: AppColors.primaryLight.withValues(alpha: 0.6),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppColors.primary.withOpacity(0.2)),
+        border: Border.all(color: AppColors.primary.withValues(alpha: 0.2)),
       ),
       child: Row(
         children: [
@@ -459,7 +374,7 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
           const SizedBox(width: 8),
           const Expanded(
             child: Text(
-              'One-click demo preset active',
+              'Demo credentials pre-filled',
               style: TextStyle(
                 fontSize: 12,
                 fontWeight: FontWeight.w600,
@@ -473,7 +388,7 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
               minimumSize: const Size(50, 30),
               tapTargetSize: MaterialTapTargetSize.shrinkWrap,
             ),
-            onPressed: () => _fillDemoCredentials('Owner'),
+            onPressed: _resetDemoCredentials,
             child: const Text('Reset', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
           ),
         ],
