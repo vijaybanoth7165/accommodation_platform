@@ -300,10 +300,6 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
               child: TextFormField(
                 controller: _phoneController,
                 keyboardType: TextInputType.text,
-                inputFormatters: [
-                  FilteringTextInputFormatter.allow(RegExp(r'[0-9]')),
-                  LengthLimitingTextInputFormatter(10),
-                ],
                 style: const TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
