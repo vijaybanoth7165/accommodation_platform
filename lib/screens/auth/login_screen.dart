@@ -150,7 +150,7 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
 
                           // Tab Content
                           SizedBox(
-                            height: 210,
+                            height: 220,
                             child: TabBarView(
                               controller: _authTabController,
                               children: [
@@ -270,10 +270,9 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Container(
-              height: 54,
+              height: 52,
               padding: const EdgeInsets.symmetric(horizontal: 12),
               decoration: BoxDecoration(
                 color: AppColors.surfaceVariant.withValues(alpha: 0.6),
@@ -300,7 +299,7 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
             Expanded(
               child: TextFormField(
                 controller: _phoneController,
-                keyboardType: TextInputType.number,
+                keyboardType: TextInputType.phone,
                 inputFormatters: [
                   FilteringTextInputFormatter.digitsOnly,
                   LengthLimitingTextInputFormatter(10),
@@ -308,18 +307,18 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                 style: const TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
-                  letterSpacing: 1.0,
+                  letterSpacing: 1.2,
                 ),
                 decoration: const InputDecoration(
-                  labelText: 'Mobile Number',
-                  hintText: '98765 43210',
+                  hintText: 'Enter 10-digit number',
+                  contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 15),
                   counterText: '',
                 ),
               ),
             ),
           ],
         ),
-        const SizedBox(height: 12),
+        const SizedBox(height: 14),
         if (!_otpSent)
           OutlinedButton.icon(
             style: OutlinedButton.styleFrom(
@@ -349,8 +348,8 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
               LengthLimitingTextInputFormatter(4),
             ],
             decoration: const InputDecoration(
-              labelText: 'Enter 4-Digit OTP',
-              hintText: '4567',
+              hintText: 'Enter 4-Digit OTP',
+              contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 14),
               prefixIcon: Icon(Icons.lock_clock_outlined, size: 20),
               counterText: '',
             ),
