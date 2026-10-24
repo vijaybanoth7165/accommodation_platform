@@ -15,7 +15,7 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
   late TabController _authTabController;
 
   // Controllers
-  final _phoneController = TextEditingController(text: '9876543210');
+  final _phoneController = TextEditingController();
   final _otpController = TextEditingController();
   final _emailController = TextEditingController(text: 'owner@stayflow.com');
   final _passwordController = TextEditingController(text: 'password123');
@@ -308,7 +308,11 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
                   letterSpacing: 1.2,
+                  color: AppColors.textPrimary,
                 ),
+                cursorColor: AppColors.primary,
+                showCursor: true,
+                enableInteractiveSelection: true,
                 decoration: const InputDecoration(
                   hintText: 'Enter 10-digit number',
                   contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 15),
