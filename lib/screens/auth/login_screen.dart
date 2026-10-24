@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import '../../core/constants/app_colors.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -268,25 +269,55 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        TextFormField(
-          controller: _phoneController,
-          keyboardType: TextInputType.phone,
-          decoration: InputDecoration(
-            labelText: 'Registered Mobile Number',
-            hintText: '98765 43210',
-            prefixIcon: Container(
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              height: 54,
               padding: const EdgeInsets.symmetric(horizontal: 12),
-              alignment: Alignment.centerLeft,
-              width: 60,
-              child: const Text(
-                '+91',
-                style: TextStyle(
+              decoration: BoxDecoration(
+                color: AppColors.surfaceVariant.withValues(alpha: 0.6),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: AppColors.border),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: const [
+                  Text('🇮🇳', style: TextStyle(fontSize: 18)),
+                  SizedBox(width: 6),
+                  Text(
+                    '+91',
+                    style: TextStyle(
+                      fontWeight: FontWeight.w700,
+                      fontSize: 15,
+                      color: AppColors.textPrimary,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(width: 10),
+            Expanded(
+              child: TextFormField(
+                controller: _phoneController,
+                keyboardType: TextInputType.number,
+                inputFormatters: [
+                  FilteringTextInputFormatter.digitsOnly,
+                  LengthLimitingTextInputFormatter(10),
+                ],
+                style: const TextStyle(
+                  fontSize: 16,
                   fontWeight: FontWeight.w600,
-                  color: AppColors.textPrimary,
+                  letterSpacing: 1.0,
+                ),
+                decoration: const InputDecoration(
+                  labelText: 'Mobile Number',
+                  hintText: '98765 43210',
+                  counterText: '',
                 ),
               ),
             ),
-          ),
+          ],
         ),
         const SizedBox(height: 12),
         if (!_otpSent)
@@ -313,7 +344,10 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
           TextFormField(
             controller: _otpController,
             keyboardType: TextInputType.number,
-            maxLength: 4,
+            inputFormatters: [
+              FilteringTextInputFormatter.digitsOnly,
+              LengthLimitingTextInputFormatter(4),
+            ],
             decoration: const InputDecoration(
               labelText: 'Enter 4-Digit OTP',
               hintText: '4567',
