@@ -300,6 +300,9 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
               child: TextFormField(
                 controller: _phoneController,
                 keyboardType: TextInputType.text,
+                inputFormatters: [
+                  SmartPhoneInputFormatter(maxLength: 10),
+                ],
                 style: const TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
@@ -342,10 +345,9 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
         else
           TextFormField(
             controller: _otpController,
-            keyboardType: TextInputType.number,
+            keyboardType: TextInputType.text,
             inputFormatters: [
-              FilteringTextInputFormatter.digitsOnly,
-              LengthLimitingTextInputFormatter(4),
+              SmartPhoneInputFormatter(maxLength: 4),
             ],
             decoration: const InputDecoration(
               hintText: 'Enter 4-Digit OTP',
@@ -426,6 +428,53 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
           ),
         ],
       ),
+    );
+  }
+}
+
+/// Automatically translates shifted number-key symbols ($, %, ^, &) to digits (4, 5, 6, 7)
+/// and enforces pure numeric digits with a configurable maximum length.
+class SmartPhoneInputFormatter extends TextInputFormatter {
+  final int maxLength;
+
+  SmartPhoneInputFormatter({this.maxLength = 10});
+
+  static const Map<String, String> _symbolToDigit = {
+    '!': '1',
+    '@': '2',
+    '#': '3',
+    '\$': '4',
+    '%': '5',
+    '^': '6',
+    '&': '7',
+    '*': '8',
+    '(': '9',
+    ')': '0',
+  };
+
+  @override
+  TextEditingValue formatEditUpdate(
+    TextEditingValue oldValue,
+    TextEditingValue newValue,
+  ) {
+    String text = newValue.text;
+
+    // Convert any shifted keyboard symbol to its corresponding digit
+    _symbolToDigit.forEach((symbol, digit) {
+      text = text.replaceAll(symbol, digit);
+    });
+
+    // Strip out any non-numeric characters
+    text = text.replaceAll(RegExp(r'[^0-9]'), '');
+
+    // Cap at maxLength
+    if (text.length > maxLength) {
+      text = text.substring(0, maxLength);
+    }
+
+    return TextEditingValue(
+      text: text,
+      selection: TextSelection.collapsed(offset: text.length),
     );
   }
 }
