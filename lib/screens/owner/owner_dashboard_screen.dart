@@ -4,6 +4,8 @@ import '../../data/mock_data.dart';
 import '../../models/property_model.dart';
 import '../rooms/rooms_screen.dart';
 import '../rooms/bed_availability_screen.dart';
+import '../residents/resident_onboarding_screen.dart';
+import '../residents/residents_list_screen.dart';
 import '../settings/settings_screen.dart';
 
 class OwnerDashboardScreen extends StatefulWidget {
@@ -195,10 +197,19 @@ class _OwnerDashboardScreenState extends State<OwnerDashboardScreen> {
                     child: _buildMetricCard(
                       title: 'Pending Dues',
                       value: '₹${totalDues.toInt()}',
-                      subtext: '2 Residents unpaid',
+                      subtext: 'Tap to view & remind',
                       icon: Icons.warning_amber_rounded,
                       color: AppColors.occupied,
                       bgColor: AppColors.occupiedBg,
+                      onTap: () async {
+                        await Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => ResidentsListScreen(property: currentProperty),
+                          ),
+                        );
+                        setState(() {});
+                      },
                     ),
                   ),
                 ],
@@ -249,29 +260,32 @@ class _OwnerDashboardScreenState extends State<OwnerDashboardScreen> {
         selectedItemColor: AppColors.primary,
         unselectedItemColor: AppColors.textSecondary,
         type: BottomNavigationBarType.fixed,
-        onTap: (index) {
+        onTap: (index) async {
           if (index == 1) {
-            Navigator.push(
+            await Navigator.push(
               context,
               MaterialPageRoute(builder: (context) => RoomsScreen(property: currentProperty)),
             );
+            setState(() {});
           } else if (index == 2) {
-            Navigator.push(
+            await Navigator.push(
               context,
               MaterialPageRoute(builder: (context) => BedAvailabilityScreen(property: currentProperty)),
             );
+            setState(() {});
           } else if (index == 3) {
-            Navigator.push(
+            await Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => SettingsScreen(onLogout: widget.onLogout)),
+              MaterialPageRoute(builder: (context) => ResidentsListScreen(property: currentProperty)),
             );
+            setState(() {});
           }
         },
         items: const [
           BottomNavigationBarItem(icon: Icon(Icons.dashboard_rounded), label: 'Dashboard'),
           BottomNavigationBarItem(icon: Icon(Icons.meeting_room_outlined), label: 'Rooms'),
           BottomNavigationBarItem(icon: Icon(Icons.hotel_outlined), label: 'Availability'),
-          BottomNavigationBarItem(icon: Icon(Icons.settings_outlined), label: 'Settings'),
+          BottomNavigationBarItem(icon: Icon(Icons.people_outline_rounded), label: 'Residents'),
         ],
       ),
     );
@@ -356,13 +370,14 @@ class _OwnerDashboardScreenState extends State<OwnerDashboardScreen> {
         'subtitle': 'KYC & bed allocate',
         'icon': Icons.person_add_alt_1_rounded,
         'color': AppColors.primary,
-        'onTap': () {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Resident Onboarding & KYC flow is up next!'),
-              behavior: SnackBarBehavior.floating,
+        'onTap': () async {
+          final res = await Navigator.push<bool>(
+            context,
+            MaterialPageRoute(
+              builder: (context) => ResidentOnboardingScreen(preselectedProperty: currentProperty),
             ),
           );
+          if (res == true) setState(() {});
         },
       },
       {
@@ -370,13 +385,14 @@ class _OwnerDashboardScreenState extends State<OwnerDashboardScreen> {
         'subtitle': 'Record rent & WhatsApp receipt',
         'icon': Icons.receipt_long_rounded,
         'color': const Color(0xFFD97706),
-        'onTap': () {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Fee collection & Digital receipt generator opened'),
-              behavior: SnackBarBehavior.floating,
+        'onTap': () async {
+          await Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => ResidentsListScreen(property: currentProperty),
             ),
           );
+          setState(() {});
         },
       },
       {

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import '../../core/constants/app_colors.dart';
+import '../../data/mock_data.dart';
 import '../../models/property_model.dart';
+import '../residents/resident_onboarding_screen.dart';
 
 class BedAvailabilityScreen extends StatefulWidget {
   final Property property;
@@ -404,14 +406,21 @@ class _BedAvailabilityScreenState extends State<BedAvailabilityScreen> {
               ),
               const SizedBox(height: 16),
               ElevatedButton.icon(
-                onPressed: () {
+                onPressed: () async {
                   Navigator.pop(context);
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text('Opening onboarding form for ${bed.code}...'),
-                      behavior: SnackBarBehavior.floating,
+                  final allocated = await Navigator.push<bool>(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => ResidentOnboardingScreen(
+                        preselectedProperty: widget.property,
+                        preselectedRoom: room,
+                        preselectedBed: bed,
+                      ),
                     ),
                   );
+                  if (allocated == true) {
+                    setState(() {});
+                  }
                 },
                 icon: const Icon(Icons.person_add_rounded),
                 label: const Text('Add Resident & KYC Details'),
@@ -531,9 +540,18 @@ class _BedAvailabilityScreenState extends State<BedAvailabilityScreen> {
                       ),
                       onPressed: () {
                         Navigator.pop(context);
+                        // Find matching resident or vacate directly
+                        final resident = MockData.residents.firstWhere(
+                          (r) => r.propertyId == widget.property.id && r.roomNumber == room.roomNumber && r.bedCode == bed.code && !r.isVacated,
+                          orElse: () => MockData.residents.first,
+                        );
+                        setState(() {
+                          MockData.vacateResident(resident.id);
+                        });
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
-                            content: Text('Vacating workflow initiated for ${bed.residentName}. Bed ${bed.code} will be released after deposit settlement.'),
+                            content: Text('${bed.residentName} vacated. Bed ${bed.code} is now 🟢 Available!'),
+                            backgroundColor: AppColors.vacant,
                             behavior: SnackBarBehavior.floating,
                           ),
                         );

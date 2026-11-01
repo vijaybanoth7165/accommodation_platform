@@ -1,4 +1,5 @@
 import '../models/property_model.dart';
+import '../models/resident_model.dart';
 
 class MockData {
   static final List<Property> properties = [
@@ -207,4 +208,186 @@ class MockData {
       ],
     ),
   ];
+
+  // Initial Seed Residents
+  static final List<Resident> residents = [
+    Resident(
+      id: 'res-1',
+      name: 'Rahul Sharma',
+      phone: '9876511001',
+      email: 'rahul.sharma@example.com',
+      dateOfBirth: '14 May 1999',
+      bloodGroup: 'B+',
+      vehicleNumber: 'KA-01-EQ-4421',
+      guardianName: 'Rajesh Sharma',
+      guardianPhone: '9876500111',
+      guardianRelation: 'Father',
+      permanentAddress: 'House 12, Civil Lines, Jaipur, Rajasthan',
+      city: 'Jaipur',
+      state: 'Rajasthan',
+      pincode: '302006',
+      idProofType: 'Aadhaar Card',
+      idProofNumber: 'XXXX-XXXX-4589',
+      propertyId: 'prop-1',
+      propertyName: 'Sunrise Premium Co-Living',
+      roomNumber: '101',
+      bedCode: 'Bed 101-A',
+      joiningDate: '01 Oct 2026',
+      monthlyRent: 9000,
+      securityDeposit: 10000,
+      pendingBalance: 0,
+      status: ResidentStatus.active,
+      transactions: [
+        PaymentTransaction(
+          id: 'tx-1',
+          receiptNumber: 'REC-2026-101',
+          date: DateTime(2026, 10, 1),
+          amount: 19000,
+          type: PaymentType.rent,
+          mode: PaymentMode.upi,
+          referenceNumber: 'UPI/629103847291',
+          notes: 'Joining rent (₹9,000) + Security Deposit (₹10,000)',
+        ),
+      ],
+    ),
+    Resident(
+      id: 'res-2',
+      name: 'Amit Patel',
+      phone: '9876511002',
+      email: 'amit.patel@example.com',
+      dateOfBirth: '22 Aug 2000',
+      bloodGroup: 'O+',
+      vehicleNumber: 'KA-03-MM-7890',
+      guardianName: 'Dinesh Patel',
+      guardianPhone: '9876500222',
+      guardianRelation: 'Father',
+      permanentAddress: 'B-402, Shivalik Parkview, Ahmedabad, Gujarat',
+      city: 'Ahmedabad',
+      state: 'Gujarat',
+      pincode: '380015',
+      idProofType: 'Aadhaar Card',
+      idProofNumber: 'XXXX-XXXX-8912',
+      propertyId: 'prop-1',
+      propertyName: 'Sunrise Premium Co-Living',
+      roomNumber: '102',
+      bedCode: 'Bed 102-A',
+      joiningDate: '15 Sep 2026',
+      monthlyRent: 6000,
+      securityDeposit: 8000,
+      pendingBalance: 2500,
+      status: ResidentStatus.active,
+      transactions: [
+        PaymentTransaction(
+          id: 'tx-2',
+          receiptNumber: 'REC-2026-102',
+          date: DateTime(2026, 10, 5),
+          amount: 3500,
+          type: PaymentType.rent,
+          mode: PaymentMode.upi,
+          referenceNumber: 'UPI/629108492019',
+          notes: 'Partial payment of October Rent (₹2,500 due)',
+        ),
+      ],
+    ),
+    Resident(
+      id: 'res-3',
+      name: 'Priya Nair',
+      phone: '9876522001',
+      email: 'priya.nair@example.com',
+      dateOfBirth: '05 Jan 2001',
+      bloodGroup: 'A+',
+      vehicleNumber: '',
+      guardianName: 'Mohan Nair',
+      guardianPhone: '9876500333',
+      guardianRelation: 'Father',
+      permanentAddress: 'Green Valley, MG Road, Kochi, Kerala',
+      city: 'Kochi',
+      state: 'Kerala',
+      pincode: '682016',
+      idProofType: 'Aadhaar Card',
+      idProofNumber: 'XXXX-XXXX-3341',
+      propertyId: 'prop-2',
+      propertyName: 'Grand Orchid Women’s Hostel',
+      roomNumber: 'W-101',
+      bedCode: 'Bed W101-A',
+      joiningDate: '01 Oct 2026',
+      monthlyRent: 9500,
+      securityDeposit: 10000,
+      pendingBalance: 0,
+      status: ResidentStatus.active,
+      transactions: [
+        PaymentTransaction(
+          id: 'tx-3',
+          receiptNumber: 'REC-2026-103',
+          date: DateTime(2026, 10, 1),
+          amount: 19500,
+          type: PaymentType.rent,
+          mode: PaymentMode.upi,
+          referenceNumber: 'UPI/992810481920',
+          notes: 'Joining rent + Security Deposit',
+        ),
+      ],
+    ),
+  ];
+
+  // Helper method to register a new resident and update bed availability
+  static void registerResident(Resident resident) {
+    residents.insert(0, resident);
+
+    // Locate the property and bed to occupy
+    for (var property in properties) {
+      if (property.id == resident.propertyId) {
+        for (var room in property.rooms) {
+          if (room.roomNumber == resident.roomNumber) {
+            for (int i = 0; i < room.beds.length; i++) {
+              if (room.beds[i].code == resident.bedCode) {
+                room.beds[i] = Bed(
+                  id: room.beds[i].id,
+                  code: room.beds[i].code,
+                  status: BedStatus.occupied,
+                  residentName: resident.name,
+                  residentPhone: '+91 ${resident.phone}',
+                  monthlyRent: resident.monthlyRent,
+                  pendingBalance: resident.pendingBalance,
+                  joiningDate: resident.joiningDate,
+                );
+                return;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  // Vacate resident & release bed
+  static void vacateResident(String residentId, {double deduction = 0, String reason = ''}) {
+    final residentIndex = residents.indexWhere((r) => r.id == residentId);
+    if (residentIndex == -1) return;
+
+    final resident = residents[residentIndex];
+    resident.status = ResidentStatus.vacated;
+
+    // Release bed in the property
+    for (var property in properties) {
+      if (property.id == resident.propertyId) {
+        for (var room in property.rooms) {
+          if (room.roomNumber == resident.roomNumber) {
+            for (int i = 0; i < room.beds.length; i++) {
+              if (room.beds[i].code == resident.bedCode) {
+                room.beds[i] = Bed(
+                  id: room.beds[i].id,
+                  code: room.beds[i].code,
+                  status: BedStatus.vacant,
+                  monthlyRent: room.rentPerBed,
+                  pendingBalance: 0,
+                );
+                return;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
 }
